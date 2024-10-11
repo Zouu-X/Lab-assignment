@@ -1,0 +1,35 @@
+services:
+  rpyc-server:
+    build: ./server
+    depends_on:
+      - redis
+    ports:
+      - "18810:18812" # Expose the server on port 18812
+    volumes:
+      - ./scripts:/app/scripts
+#  rpyc-server1:
+#    build: ./server
+#    depends_on:
+#      - redis
+#    ports:
+#      - "18811:18812" # Expose the server on port 18812
+#    volumes:
+#      - ./script:/app/script
+#  rpyc-server2:
+#    build: ./server
+#    depends_on:
+#      - redis
+#    ports:
+#      - "18812:18812" # Expose the server on port 18812
+#    volumes:
+#      - ./script:/app/script
+
+  rpyc-client:
+    build: ./client
+    depends_on:
+      - rpyc-server
+
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379" # Expose Redis on port 6379
