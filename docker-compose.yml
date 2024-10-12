@@ -2,7 +2,7 @@ services:
   load-balancer:
     build: ./load-balancer
     ports:
-      - "18888:18888" # Expose the load balancer on port 18811
+      - "18888:18888" # Expose the load load-balancer on port 18811
     depends_on:
       - rpyc-server1
       - rpyc-server2
