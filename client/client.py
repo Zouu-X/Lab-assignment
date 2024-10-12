@@ -1,7 +1,8 @@
 import rpyc
 
 def main():
-    conn = rpyc.connect("rpyc-server", 18812)
+    # 连接到负载均衡器
+    conn = rpyc.connect("load-balancer", 18888)
     word_to_count = "spider"
     text_to_find = "spiderman.txt"
     result = conn.root.get_word_count(word_to_count, text_to_find)
