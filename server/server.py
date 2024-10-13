@@ -1,20 +1,18 @@
 import rpyc
+import re
+from collections import Counter
 import redis
 import hashlib
 
 
 def getTxt(text):
-    txt = text.lower()
-    for ch in '''!"$%&()*+,-./;:<=>?@[\\]^_{|}~''\n\t ''':
-        txt = txt.replace(ch, " ")
-    return txt
+    # 使用正则表达式一次性替换所有特殊字符和空白字符
+    return re.sub(r'[!"$%&()*+,-./;:<=>?@[\\]^_{|}~\s]+', ' ', text.lower())
 
 def count_words(text, word):
-    words = text.split()
-    counts = {}
-    for w in words:
-        counts[w] = counts.get(w, 0)+1
-    return counts.get(word, 0)
+    # 使用Counter来计算所有单词的频率
+    counts = Counter(text.split())
+    return counts[word]
 
 def read_text_from_file(file_path):
     with open(file_path, 'r', encoding='utf-8') as file:
