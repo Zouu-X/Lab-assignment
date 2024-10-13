@@ -6,6 +6,7 @@ services:
     depends_on:
       - rpyc-server1
       - rpyc-server2
+      - rpyc-server3
 
   rpyc-server1:
     build: ./server
@@ -15,6 +16,13 @@ services:
     volumes:
       - ./scripts:/app/scripts
   rpyc-server2:
+    build: ./server
+    depends_on:
+      - redis
+    volumes:
+      - ./scripts:/app/scripts
+
+  rpyc-server3:
     build: ./server
     depends_on:
       - redis

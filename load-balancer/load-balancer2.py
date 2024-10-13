@@ -5,6 +5,7 @@ import collections
 servers = {
     'rpyc-server1:18812': 0,
     'rpyc-server2:18812': 0,
+    'rpyc-server3:18812': 0,
 }
 
 #获取最少连接服务器
