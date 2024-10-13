@@ -3,6 +3,12 @@ import re
 from collections import Counter
 import redis
 import hashlib
+import socket
+import logging
+
+# 配置日志记录
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 
 def getTxt(text):
@@ -29,15 +35,18 @@ class WordCountService(rpyc.Service):
         hash_key = hashlib.md5((word + file_path).encode()).hexdigest()
         count = self.redis_client.get(hash_key)
         if count is not None:
+            logging.info(f"{socket.gethostname()}:Cache hit for {word} in {path}")
             return int(count)  # 如果在缓存中找到了，直接返回结果
 
         # 读取和处理文件
+        logging.info(f"{socket.gethostname()}:Cache miss for {word} in {path}")
         text = read_text_from_file(file_path)
         text = getTxt(text)
         count = count_words(text, word)
 
         # 将结果缓存到 Redis
         self.redis_client.set(hash_key, count)
+        logging.info(f"{socket.gethostname()}:Cache set for {word} in {path}")
         return count
 
 
