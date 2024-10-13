@@ -21,7 +21,6 @@ services:
       - redis
     volumes:
       - ./scripts:/app/scripts
-
   rpyc-server3:
     build: ./server
     depends_on:
@@ -40,6 +39,21 @@ services:
     depends_on:
       - load-balancer
     command: ["python", "client2.py"]
+  rpyc-client3:
+    build: ./client
+    depends_on:
+      - load-balancer
+    command: ["python", "client3.py"]
+  rpyc-client4:
+    build: ./client
+    depends_on:
+      - load-balancer
+    command: ["python", "client4.py"]
+  rpyc-client5:
+    build: ./client
+    depends_on:
+      - load-balancer
+    command: ["python", "client5.py"]
 
   redis:
     image: "redis:alpine"
