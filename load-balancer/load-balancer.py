@@ -1,62 +1,42 @@
-import socket
-import select
+import asyncio
 
-def handle_client(client_socket, target_server_address):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-        server_socket.connect(target_server_address)
-
-        # 将客户端socket和服务器socket加入到同一个循环中，进行数据转发
-        sockets_list = [client_socket, server_socket]
-        running = True
-
-        while running:
-            # 可读socket列表
-            readable, _, _ = select.select(sockets_list, [], sockets_list, 0.5)
-
-            if not readable:
-                continue
-
-            for sock in readable:
-                try:
-                    data = sock.recv(4096)  # 尝试从socket读取数据
-                    if data:
-                        # 数据来自客户端，发送到服务器；来自服务器，发送回客户端
-                        if sock is client_socket:
-                            server_socket.sendall(data)
-                        else:
-                            client_socket.sendall(data)
-                    else:
-                        # 没有数据表示连接已关闭
-                        running = False
-                        break
-                except Exception as e:
-                    print(f"Error: {e}")
-                    running = False
-                    break
-
-def main():
-    server_address_list = [('rpyc-server1', 18812), ('rpyc-server2', 18812)]
-    current_server = 0
-
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind(('0.0.0.0', 18888))
-    server.listen(5)
+async def handle_client(reader, writer, target_server_address):
+    # 创建到目标服务器的连接
+    server_reader, server_writer = await asyncio.open_connection(*target_server_address)
 
     try:
+        # 同时处理来自客户端和服务器的数据
         while True:
-            client_socket, client_address = server.accept()
-            print(f"Accepted connection from {client_address}")
+            # 等待数据从客户端接收
+            data = await reader.read(4096)
+            if not data:
+                break
+            # 数据发送到服务器
+            server_writer.write(data)
+            await server_writer.drain()
 
-            target_server_address = server_address_list[current_server]
-            current_server = (current_server + 1) % len(server_address_list)
-
-            # 处理客户端请求
-            handle_client(client_socket, target_server_address)
+            # 等待数据从服务器接收
+            response = await server_reader.read(4096)
+            if not response:
+                break
+            # 数据发送回客户端
+            writer.write(response)
+            await writer.drain()
     except Exception as e:
-        print(f"Server error: {e}")
+        print(f"Error: {e}")
     finally:
-        server.close()
+        # 关闭所有连接
+        writer.close()
+        server_writer.close()
 
-if __name__ == "__main__":
-    main()
+async def run_server(server_address, server_port, server_targets):
+    server = await asyncio.start_server(
+        lambda r, w: handle_client(r, w, server_targets[next(server_index)]),
+        server_address, server_port)
+    async with server:
+        await server.serve_forever()
+
+server_address_list = [('rpyc-server1', 18812), ('rpyc-server2', 18812)]
+server_index = iter(range(len(server_address_list)))
+
+asyncio.run(run_server('0.0.0.0', 18888, server_address_list))
