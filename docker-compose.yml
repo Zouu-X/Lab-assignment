@@ -26,6 +26,12 @@ services:
     build: ./client
     depends_on:
       - load-balancer
+    command: ["python", "client.py"]
+  rpyc-client2:
+    build: ./client
+    depends_on:
+      - load-balancer
+    command: ["python", "client2.py"]
 
   redis:
     image: "redis:alpine"
