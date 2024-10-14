@@ -1,58 +1,57 @@
 services:
-  load-balancer:
-    build: ./load-balancer
-    ports:
-      - "18888:18888" # Expose the load load-balancer on port 18811
-    depends_on:
-      - rpyc-server1
-      - rpyc-server2
-      - rpyc-server3
+#  load-balancer:
+#    build: ./load-balancer
+#    ports:
+#      - "18888:18888" # Expose the load load-balancer on port 18811
+#    depends_on:
+#      - rpyc-server1
+#      - rpyc-server2
+#      - rpyc-server3
 
   rpyc-server1:
     build: ./server
     depends_on:
       - redis
-
     volumes:
       - ./scripts:/app/scripts
-  rpyc-server2:
-    build: ./server
-    depends_on:
-      - redis
-    volumes:
-      - ./scripts:/app/scripts
-  rpyc-server3:
-    build: ./server
-    depends_on:
-      - redis
-    volumes:
-      - ./scripts:/app/scripts
+#  rpyc-server2:
+#    build: ./server
+#    depends_on:
+#      - redis
+#    volumes:
+#      - ./scripts:/app/scripts
+#  rpyc-server3:
+#    build: ./server
+#    depends_on:
+#      - redis
+#    volumes:
+#      - ./scripts:/app/scripts
 
 
   rpyc-client:
     build: ./client
     depends_on:
-      - load-balancer
+      - rpyc-server1
     command: ["python", "client.py"]
   rpyc-client2:
     build: ./client
     depends_on:
-      - load-balancer
+      - rpyc-server1
     command: ["python", "client2.py"]
   rpyc-client3:
     build: ./client
     depends_on:
-      - load-balancer
+      - rpyc-server1
     command: ["python", "client3.py"]
   rpyc-client4:
     build: ./client
     depends_on:
-      - load-balancer
+      - rpyc-server1
     command: ["python", "client4.py"]
   rpyc-client5:
     build: ./client
     depends_on:
-      - load-balancer
+      - rpyc-server1
     command: ["python", "client5.py"]
 
   redis:

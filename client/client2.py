@@ -3,7 +3,7 @@ import time
 
 def main():
     # 连接到负载均衡器
-    conn = rpyc.connect("load-balancer", 18888)
+    conn = rpyc.connect("rpyc-server1", 18812)
     word_to_count = "sure"
     text_to_find = "Wonka.txt"
 
