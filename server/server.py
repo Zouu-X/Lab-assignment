@@ -39,14 +39,14 @@ class WordCountService(rpyc.Service):
             return int(count)  # 如果在缓存中找到了，直接返回结果
 
         # 读取和处理文件
-        logging.info(f"{socket.gethostname()}:Cache miss for {word} in {path}")
+        # logging.info(f"{socket.gethostname()}:Cache miss for {word} in {path}")
         text = read_text_from_file(file_path)
         text = getTxt(text)
         count = count_words(text, word)
 
         # 将结果缓存到 Redis
         self.redis_client.set(hash_key, count)
-        logging.info(f"{socket.gethostname()}:Cache set for {word} in {path}")
+        # logging.info(f"{socket.gethostname()}:Cache set for {word} in {path}")
         return count
 
 

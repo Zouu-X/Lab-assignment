@@ -1,4 +1,6 @@
 import asyncio
+import itertools
+
 
 async def handle_client(reader, writer, target_server_address):
     # 创建到目标服务器的连接
@@ -29,14 +31,17 @@ async def handle_client(reader, writer, target_server_address):
         writer.close()
         server_writer.close()
 
+
 async def run_server(server_address, server_port, server_targets):
+    server_index = itertools.cycle(server_targets)  # 使用 itertools.cycle 实现循环迭代
+
     server = await asyncio.start_server(
-        lambda r, w: handle_client(r, w, server_targets[next(server_index)]),
+        lambda r, w: handle_client(r, w, next(server_index)),
         server_address, server_port)
     async with server:
         await server.serve_forever()
 
+
 server_address_list = [('rpyc-server1', 18812), ('rpyc-server2', 18812), ('rpyc-server3', 18812)]
-server_index = iter(range(len(server_address_list)))
 
 asyncio.run(run_server('0.0.0.0', 18888, server_address_list))
