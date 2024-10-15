@@ -2,4 +2,4 @@ FROM python:3.9-slim
 WORKDIR /app
 COPY . /app
 
-CMD ["python", "load-balancer2.py"]
+CMD ["python", "load-balancer.py"]
