@@ -16,10 +16,6 @@ async def health_check(server_targets):
         await asyncio.sleep(10)  # Perform health check every 10 seconds
 
 async def handle_client(reader, writer, target_server_address):
-    """
-    Handles the client request by creating a connection to the target server
-    and forwarding data between the client and the server. Manages two TCP connections.
-    """
     try:
         server_reader, server_writer = await asyncio.open_connection(*target_server_address)
     except Exception as e:
@@ -48,10 +44,6 @@ async def handle_client(reader, writer, target_server_address):
         server_writer.close()
 
 async def run_server(server_address, server_port, server_targets):
-    """
-    Starts the load balancer server, which listens for incoming client connections
-    and forwards them to target servers in a round-robin manner. Includes health checks.
-    """
     server_index = itertools.cycle(server_targets)  # Use itertools.cycle to iterate over servers
 
     # Run health check task in the background
