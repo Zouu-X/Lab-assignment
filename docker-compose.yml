@@ -33,26 +33,36 @@ services:
     depends_on:
       - rpyc-server1
     command: ["python", "client.py"]
+    volumes:
+      - ./exec-latency:/app/exec-latency
   rpyc-client2:
     build: ./client
     depends_on:
       - rpyc-server1
     command: ["python", "client2.py"]
+    volumes:
+      - ./exec-latency:/app/exec-latency
   rpyc-client3:
     build: ./client
     depends_on:
       - rpyc-server1
     command: ["python", "client3.py"]
+    volumes:
+      - ./exec-latency:/app/exec-latency
   rpyc-client4:
     build: ./client
     depends_on:
       - rpyc-server1
     command: ["python", "client4.py"]
+    volumes:
+      - ./exec-latency:/app/exec-latency
   rpyc-client5:
     build: ./client
     depends_on:
       - rpyc-server1
     command: ["python", "client5.py"]
+    volumes:
+      - ./exec-latency:/app/exec-latency
 
   redis:
     image: "redis:alpine"
