@@ -21,14 +21,17 @@ def count_words(text, word):
     return counts[word]
 
 def read_text_from_file(file_path):
+    #读取文件
     with open(file_path, 'r', encoding='utf-8') as file:
         return file.read()
 
 class WordCountService(rpyc.Service):
 
     def on_connect(self, conn):
+        # 连接到 Redis
         self.redis_client = redis.Redis(host='redis', port=6379, db=0)
 
+    # 暴露的方法 get_word_count
     def exposed_get_word_count(self, word, path):
         file_path = f'/app/scripts/{path}'
         # 从 Redis 获取缓存结果
