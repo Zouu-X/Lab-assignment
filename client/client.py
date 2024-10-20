@@ -4,7 +4,7 @@ import time
 def main():
     # 连接到负载均衡器
     conn = rpyc.connect("load-balancer", 18888)
-    word_to_count = ""
+    word_to_count = "busy"
     text_to_find = "spiderman.txt"
 
     # 开始时间戳
