@@ -1,6 +1,5 @@
 import rpyc
 import time
-
 def main():
     # 连接到负载均衡器
     conn = rpyc.connect("load-balancer", 18888)
