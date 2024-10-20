@@ -30,25 +30,39 @@ class WordCountService(rpyc.Service):
     def on_connect(self, conn):
         self.redis_client = redis.Redis(host='redis', port=6379, db=0)
 
+
     def exposed_get_word_count(self, word, path):
-        file_path = f'/app/scripts/{path}'
-        # 从 Redis 获取缓存结果
-        hash_key = hashlib.md5((word + file_path).encode()).hexdigest()
-        count = self.redis_client.get(hash_key)
-        if count is not None:
-            logging.info(f"{socket.gethostname()}:Cache hit for {word} in {path}")
-            return int(count)  # 如果在缓存中找到了，直接返回结果
+        try:
+            if not word or not path:
+                raise ValueError("Both word and path must be provided")
+            file_path = f'/app/scripts/{path}'
+            # 从 Redis 获取缓存结果
+            hash_key = hashlib.md5((word + file_path).encode()).hexdigest()
+            count = self.redis_client.get(hash_key)
+            if count is not None:
+                logging.info(f"{socket.gethostname()}:Cache hit for {word} in {path}")
+                return int(count)  # 如果在缓存中找到了，直接返回结果
 
-        # 读取和处理文件
-        # logging.info(f"{socket.gethostname()}:Cache miss for {word} in {path}")
-        text = read_text_from_file(file_path)
-        text = getTxt(text)
-        count = count_words(text, word)
+            # 读取和处理文件
+            # logging.info(f"{socket.gethostname()}:Cache miss for {word} in {path}")
+            text = read_text_from_file(file_path)
+            text = getTxt(text)
+            count = count_words(text, word)
 
-        # 将结果缓存到 Redis
-        self.redis_client.set(hash_key, count)
-        # logging.info(f"{socket.gethostname()}:Cache set for {word} in {path}")
-        return count
+            # 将结果缓存到 Redis
+            self.redis_client.set(hash_key, count)
+            # logging.info(f"{socket.gethostname()}:Cache set for {word} in {path}")
+            return count
+        # 捕获异常并记录日志
+        except FileNotFoundError:
+            logging.error(f"{socket.gethostname()}: File not found: {path}")
+            return {"error": f"File '{path}' not found."}
+        except ValueError as e:
+            logging.error(f"{socket.gethostname()}: {str(e)}")
+            return {"error": str(e)}
+        except Exception as e:
+            logging.error(f"{socket.gethostname()}: An unexpected error occurred: {str(e)}")
+            return {"error": "An unexpected error occurred."}
 
 
 if __name__ == "__main__":
