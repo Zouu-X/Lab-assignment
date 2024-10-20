@@ -8,7 +8,7 @@ import logging
 
 
 # 配置日志记录
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 
@@ -30,7 +30,6 @@ class WordCountService(rpyc.Service):
     def on_connect(self, conn):
         self.redis_client = redis.Redis(host='redis', port=6379, db=0)
 
-
     def exposed_get_word_count(self, word, path):
         try:
             if not word or not path:
@@ -41,19 +40,18 @@ class WordCountService(rpyc.Service):
             count = self.redis_client.get(hash_key)
             if count is not None:
                 logging.info(f"{socket.gethostname()}:Cache hit for {word} in {path}")
-                return int(count)  # 如果在缓存中找到了，直接返回结果
+                return int(count) if count.isdigit() else {"error": count.decode()}
 
             # 读取和处理文件
-            # logging.info(f"{socket.gethostname()}:Cache miss for {word} in {path}")
+            logging.info(f"{socket.gethostname()}:Cache miss for {word} in {path}")
             text = read_text_from_file(file_path)
             text = getTxt(text)
             count = count_words(text, word)
 
             # 将结果缓存到 Redis
             self.redis_client.set(hash_key, count)
-            # logging.info(f"{socket.gethostname()}:Cache set for {word} in {path}")
+            logging.info(f"{socket.gethostname()}:Cache set for {word} in {path}")
             return count
-        # 捕获异常并记录日志
         except FileNotFoundError:
             logging.error(f"{socket.gethostname()}: File not found: {path}")
             return {"error": f"File '{path}' not found."}
