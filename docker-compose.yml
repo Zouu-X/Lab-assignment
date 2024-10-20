@@ -37,26 +37,36 @@ services:
     command: ["python", "client.py"]
     profiles:
       - client_group
+    volumes:
+      - ./exec-latency:/app/exec-latency
   rpyc-client2:
     build: ./client
     command: ["python", "client2.py"]
     profiles:
       - client_group
+    volumes:
+      - ./exec-latency:/app/exec-latency
   rpyc-client3:
     build: ./client
     command: ["python", "client3.py"]
     profiles:
       - client_group
+    volumes:
+      - ./exec-latency:/app/exec-latency
   rpyc-client4:
     build: ./client
     command: ["python", "client4.py"]
     profiles:
       - client_group
+    volumes:
+      - ./exec-latency:/app/exec-latency
   rpyc-client5:
     build: ./client
     command: ["python", "client5.py"]
     profiles:
       - client_group
+    volumes:
+      - ./exec-latency:/app/exec-latency
 
   redis:
     image: "redis:alpine"
