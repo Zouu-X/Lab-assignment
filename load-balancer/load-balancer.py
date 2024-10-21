@@ -19,7 +19,7 @@ async def health_check(server_targets, available_servers, update_iterator_event)
         if set(current_available) != set(available_servers):
             available_servers[:] = current_available
             update_iterator_event.set()
-        await asyncio.sleep(10)
+        await asyncio.sleep(1)
 
 async def handle_client(reader, writer, available_servers, round_robin_iterator, update_iterator_event):
     while True:
